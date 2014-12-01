@@ -45,7 +45,7 @@ end simple_watchdog;
 
 architecture Behavioral of simple_watchdog is
 
-	signal count : std_logic_vector(15 downto 0);
+	signal count : std_logic_vector(36 downto 0);
 
 begin
 
@@ -53,12 +53,18 @@ begin
 	begin
 		if watchdog_clear = '1' then
 			count <= (others => '0');
+			reset <= '0';
 		elsif rising_edge(clk) then
-			count <= std_logic_vector(unsigned(count) + 1);
+			if (unsigned(count) = LIMIT) then
+				count <= (others => '0');
+				reset <= '1';
+			else
+				count <= std_logic_vector(unsigned(count) + 1);
+				reset <= '0';
+			end if;
+			
 		end if;
 	end process;
-	
-	reset <= '1' when (unsigned(count) = LIMIT) else '0';
 
 end Behavioral;
 
